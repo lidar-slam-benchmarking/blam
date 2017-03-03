@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(laser_loop_closure)
 
-find_package(PCL REQUIRED COMPONENTS common registration)
+find_package(PCL REQUIRED COMPONENTS common registration )
 if(NOT PCL_FOUND)
   message(FATAL_ERROR "This program requires the PCL library.")
 endif(NOT PCL_FOUND)
@@ -24,7 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
+  LIBRARIES ${PROJECT_NAME} gtsam
   CATKIN_DEPENDS
     roscpp
     geometry_utils

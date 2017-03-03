@@ -3,7 +3,11 @@ project(geometry_utils)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  geometry_msgs
+  tf2_ros
+)
 find_package(Eigen3 REQUIRED)
 
 catkin_package(
@@ -15,7 +19,7 @@ catkin_package(
     Eigen3
 )
 
-include_directories(include ${EIGEN3_INCLUDE_DIR})
+include_directories(include ${EIGEN3_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
