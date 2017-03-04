@@ -81,12 +81,12 @@ class BlamSlamOffline {
       ROS_ERROR("%s: Failed to register callbacks.", name_.c_str());
       return false;
     }
-
+    ROS_INFO_STREAM("STARTING LoadBagfile");
     if (!LoadBagfile()) {
       ROS_ERROR("%s: Failed to load bag file.", name_.c_str());
       return false;
     }
-
+    ROS_INFO_STREAM("STARTING ProcessBagfile");
     if (!ProcessBagfile()) {
       ROS_ERROR("%s: Failed to process bag file.", name_.c_str());
       return false;

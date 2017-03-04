@@ -106,6 +106,8 @@ class BlamSlam {
   LaserLoopClosure loop_closure_;
   PointCloudLocalization localization_;
   PointCloudMapper mapper_;
+
+  int process_count_;
 };
 
 #endif
