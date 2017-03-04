@@ -108,6 +108,7 @@ class BlamSlam {
   PointCloudMapper mapper_;
 
   int process_count_;
+  geometry_utils::Transform3 pre_transform_;
 };
 
 #endif

@@ -99,6 +99,21 @@ bool BlamSlam::LoadParameters(const ros::NodeHandle& n) {
   if (!pu::Get("frame_id/fixed", fixed_frame_id_)) return false;
   if (!pu::Get("frame_id/base", base_frame_id_)) return false;
 
+  // Load pre-transform position.
+   double pre_trans_x = 0.0, pre_trans_y = 0.0, pre_trans_z = 0.0;
+   double pre_trans_roll = 0.0, pre_trans_pitch = 0.0, pre_trans_yaw = 0.0;
+   if (!pu::Get("pre_trans/position/x", pre_trans_x)) return false;
+   if (!pu::Get("pre_trans/position/y", pre_trans_y)) return false;
+   if (!pu::Get("pre_trans/position/z", pre_trans_z)) return false;
+   if (!pu::Get("pre_trans/orientation/roll", pre_trans_roll)) return false;
+   if (!pu::Get("pre_trans/orientation/pitch", pre_trans_pitch)) return false;
+   if (!pu::Get("pre_trans/orientation/yaw", pre_trans_yaw)) return false;
+
+   gu::Transform3 pre_trans;
+   pre_trans.translation = gu::Vec3(pre_trans_x, pre_trans_y, pre_trans_z);
+   pre_trans.rotation = gu::Rot3(pre_trans_roll, pre_trans_pitch, pre_trans_yaw);
+   pre_transform_ = pre_trans;
+
   return true;
 }
 
@@ -189,6 +204,7 @@ void BlamSlam::ProcessPointCloudMessage(const PointCloud::ConstPtr& msg) {
   if(VERBOSE) ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: START");
   // Filter the incoming point cloud message.
   PointCloud::Ptr msg_filtered(new PointCloud);
+  //msg
   filter_.Filter(msg, msg_filtered);
   if(VERBOSE)ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: filtered "<<msg_filtered->size()<<" from "<<msg->size() );
 
