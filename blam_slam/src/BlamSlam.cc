@@ -39,6 +39,9 @@
 #include <geometry_utils/Transform3.h>
 #include <parameter_utils/ParameterUtils.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/point_cloud.h>
+#include <pcl/common/transforms.h>
+
 #define VERBOSE false
 
 namespace pu = parameter_utils;
@@ -178,7 +181,7 @@ void BlamSlam::EstimateTimerCallback(const ros::TimerEvent& ev) {
         const MeasurementSynchronizer::Message<PointCloud>::ConstPtr& m =
             synchronizer_.GetPCLPointCloudMessage(index);
         process_count_++;
-        ROS_INFO_STREAM(name_<<" ProcessPointCloudMessage "<<process_count_);
+        ROS_INFO_STREAM(name_<< " ProcessPointCloudMessage " <<process_count_);
         ProcessPointCloudMessage(m->msg);
         break;
       }
@@ -202,9 +205,11 @@ void BlamSlam::VisualizationTimerCallback(const ros::TimerEvent& ev) {
 
 void BlamSlam::ProcessPointCloudMessage(const PointCloud::ConstPtr& msg) {
   if(VERBOSE) ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: START");
+  PointCloud::Ptr msg__pre_transformed(new PointCloud);
+  PreTransformPoints(*msg,msg__pre_transformed.get());
   // Filter the incoming point cloud message.
   PointCloud::Ptr msg_filtered(new PointCloud);
-  //msg
+
   filter_.Filter(msg, msg_filtered);
   if(VERBOSE)ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: filtered "<<msg_filtered->size()<<" from "<<msg->size() );
 
@@ -318,5 +323,20 @@ bool BlamSlam::HandleLoopClosures(const PointCloud::ConstPtr& scan,
     ROS_INFO("%s: Closed loop between poses %u and %u.", name_.c_str(),
              pose_key, closure_key);
   }
+  return true;
+}
+
+bool BlamSlam::PreTransformPoints(const PointCloud& points, PointCloud* points_transformed) const
+{
+
+  const Eigen::Matrix<double, 3, 3> R = pre_transform_.rotation.Eigen();
+  const Eigen::Matrix<double, 3, 1> T = pre_transform_.translation.Eigen();
+
+  Eigen::Matrix4d tf;
+  tf.block(0, 0, 3, 3) = R;
+  tf.block(0, 3, 3, 1) = T;
+
+  pcl::transformPointCloud(points, *points_transformed, tf);
+
   return true;
 }
