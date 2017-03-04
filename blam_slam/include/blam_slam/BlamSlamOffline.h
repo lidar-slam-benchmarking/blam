@@ -208,7 +208,7 @@ class BlamSlamOffline {
           const MeasurementSynchronizer::Message<
               BlamSlam::PointCloud>::ConstPtr& m =
               synchronizer_.GetPCLPointCloudMessage(index);
-
+          ROS_INFO_STREAM("Processing "<< synchronizer_.GetPendingIndex()<<" out of Total "<< synchronizer_.GetMessageCount());
           slam_.ProcessPointCloudMessage(m->msg);
           scan_pub_.publish(m->msg);
 
