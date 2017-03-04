@@ -34,6 +34,7 @@
  * Authors: Erik Nelson            ( eanelson@eecs.berkeley.edu )
  */
 
+#include <ros/ros.h>
 #include <blam_slam/BlamSlam.h>
 #include <geometry_utils/Transform3.h>
 #include <parameter_utils/ParameterUtils.h>
@@ -183,9 +184,11 @@ void BlamSlam::VisualizationTimerCallback(const ros::TimerEvent& ev) {
 }
 
 void BlamSlam::ProcessPointCloudMessage(const PointCloud::ConstPtr& msg) {
+  ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: START");
   // Filter the incoming point cloud message.
   PointCloud::Ptr msg_filtered(new PointCloud);
   filter_.Filter(msg, msg_filtered);
+  ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: filtered "<<msg_filtered->size()<<" from "<<msg->size() );
 
   // Update odometry by performing ICP.
   if (!odometry_.UpdateEstimate(*msg_filtered)) {
@@ -193,8 +196,10 @@ void BlamSlam::ProcessPointCloudMessage(const PointCloud::ConstPtr& msg) {
     PointCloud::Ptr unused(new PointCloud);
     mapper_.InsertPoints(msg_filtered, unused.get());
     loop_closure_.AddKeyScanPair(0, msg);
+    ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: odometry_TRUE" );
     return;
   }
+  ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: odometry_FALSE" );
 
   // Containers.
   PointCloud::Ptr msg_transformed(new PointCloud);
@@ -243,6 +248,8 @@ void BlamSlam::ProcessPointCloudMessage(const PointCloud::ConstPtr& msg) {
 
   // Visualize the pose graph and current loop closure radius.
   loop_closure_.PublishPoseGraph();
+
+  ROS_INFO_STREAM("BlamSlam::ProcessPointCloudMessage:: loop_closure_" );
 
   // Publish the incoming point cloud message from the base frame.
   if (base_frame_pcld_pub_.getNumSubscribers() != 0) {
