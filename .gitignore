@@ -9,6 +9,8 @@ internal/build
 internal/devel
 internal/src
 *.catkin_workspace
+build
+devel
 
 # Swap files
 *.swp
