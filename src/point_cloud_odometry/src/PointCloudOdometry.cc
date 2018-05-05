@@ -43,6 +43,8 @@
 
 #include <pcl/registration/gicp.h>
 
+#define VERBOSE false
+
 namespace gu = geometry_utils;
 namespace gr = gu::ros;
 namespace pu = parameter_utils;
@@ -130,6 +132,7 @@ bool PointCloudOdometry::UpdateEstimate(const PointCloud& points) {
   if (!initialized_) {
     copyPointCloud(points, *query_);
     initialized_ = true;
+    if(VERBOSE)ROS_INFO_STREAM("PointCloudOdometry::UpdateEstimate initialized");
     return false;
   }
 
@@ -162,12 +165,17 @@ bool PointCloudOdometry::GetLastPointCloud(PointCloud::Ptr& out) const {
 }
 
 bool PointCloudOdometry::UpdateICP() {
+  if(VERBOSE)ROS_INFO_STREAM(" PointCloudOdometry::UpdateICP START");
   // Compute the incremental transformation.
   GeneralizedIterativeClosestPoint<PointXYZ, PointXYZ> icp;
   icp.setTransformationEpsilon(params_.icp_tf_epsilon);
   icp.setMaxCorrespondenceDistance(params_.icp_corr_dist);
   icp.setMaximumIterations(params_.icp_iterations);
-  icp.setRANSACIterations(0);
+  //icp.setRANSACIterations(0);
+  icp.setRANSACIterations(100);
+
+  icp.setRotationEpsilon(max_rotation_);
+  icp.setEuclideanFitnessEpsilon(max_translation_);
 
   icp.setInputSource(query_);
   icp.setInputTarget(reference_);
@@ -176,6 +184,7 @@ bool PointCloudOdometry::UpdateICP() {
   icp.align(unused_result);
 
   const Eigen::Matrix4f T = icp.getFinalTransformation();
+  if(VERBOSE)ROS_INFO_STREAM(" PointCloudOdometry::UpdateICP getFinalTransformation"<<T);
 
   // Update pose estimates.
   incremental_estimate_.translation = gu::Vec3(T(0, 3), T(1, 3), T(2, 3));
@@ -211,7 +220,7 @@ bool PointCloudOdometry::UpdateICP() {
   tf.header.frame_id = fixed_frame_id_;
   tf.child_frame_id = odometry_frame_id_;
   tfbr_.sendTransform(tf);
-
+  if(VERBOSE)ROS_INFO_STREAM(" PointCloudOdometry::UpdateICP ****TRUE***");
   return true;
 }
 

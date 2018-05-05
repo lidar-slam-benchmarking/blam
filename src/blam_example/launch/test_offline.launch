@@ -24,6 +24,12 @@
         position_sigma: {x: 0.1, y: 0.1, z: 0.1}
         orientation_sigma: {roll: 0.02, pitch: 0.02, yaw: 0.02}
       </rosparam>
+      
+      <!-- Pre Transform -->
+      <rosparam param="pre_trans">
+        position: {x: 0.0, y: 0.0, z: 0.0}
+        orientation: {roll: 0.0, pitch: 0.0, yaw: 0.0}
+      </rosparam>
 
       <!-- Rates -->
       <rosparam file="$(find blam_example)/config/blam_rates.yaml"/>

@@ -67,7 +67,14 @@ void MeasurementSynchronizer::SortMessages() {
 
   pending_index_ = 0;
 }
-
+unsigned int MeasurementSynchronizer::GetPendingIndex()
+{
+  return pending_index_;
+}
+unsigned int MeasurementSynchronizer::GetMessageCount()
+{
+  return sensor_ordering_.size();
+}
 bool MeasurementSynchronizer::GetNextMessage(sensor_type* type,
                                              unsigned int* index) {
   if (type == NULL || index == NULL) {

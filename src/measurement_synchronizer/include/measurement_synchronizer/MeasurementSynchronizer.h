@@ -60,6 +60,8 @@ class MeasurementSynchronizer {
   bool GetNextMessage(sensor_type* type, unsigned int* index);
   bool NextMessageExists();
   void ClearMessages();
+  unsigned int GetPendingIndex();
+  unsigned int GetMessageCount();
 
   // Templated message type for holding generic sensor messages.
   template<typename T>

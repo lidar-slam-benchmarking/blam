@@ -80,6 +80,9 @@ class BlamSlam {
   // output whether or not a new keyframe was added to the pose graph.
   bool HandleLoopClosures(const PointCloud::ConstPtr& scan, bool* new_keyframe);
 
+  //pre transform input points
+  bool PreTransformPoints(const PointCloud& points, PointCloud* points_transformed) const;
+
   // The node's name.
   std::string name_;
 
@@ -106,6 +109,9 @@ class BlamSlam {
   LaserLoopClosure loop_closure_;
   PointCloudLocalization localization_;
   PointCloudMapper mapper_;
+
+  int process_count_;
+  geometry_utils::Transform3 pre_transform_;
 };
 
 #endif
